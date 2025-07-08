@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบห้องเรียนออนไลน์ครูอาร์เธอร์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    
+    <style>
+        :root {
+            /* ☀️ Light Theme (Purple) */
+            --bg-default: #f8fafc; --bg-subtle: #ffffff; --bg-ui: #f1f5f9;
+            --text-default: #1e293b; --text-subtle: #64748b; --text-muted: #94a3b8;
+            --border-default: #e2e8f0; --border-strong: #cbd5e1;
+            --primary: #8b5cf6; --primary-fg: #ffffff; --primary-bg: #ede9fe;
+            --secondary: #ec4899; --secondary-fg: #ffffff; --secondary-bg: #fce7f3;
+            --success: #22c55e; --success-fg: #052e16; --success-bg: #dcfce7;
+            --danger: #ef4444; --danger-fg: #ffffff; --danger-bg: #fee2e2;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --scrim: rgba(30, 41, 59, 0.5);
+        }
+        
+        html.dark {
+            /* 🌙 Dark Theme (Purple) */
+            --bg-default: #0f172a; --bg-subtle: #1e293b; --bg-ui: #334155;
+            --text-default: #f1f5f9; --text-subtle: #94a3b8; --text-muted: #64748b;
+            --border-default: #334155; --border-strong: #475569;
+            --primary: #a78bfa; --primary-fg: #1e293b; --primary-bg: #4c1d95;
+            --secondary: #f472b6; --secondary-fg: #ffffff; --secondary-bg: #831843;
+            --success: #4ade80; --success-fg: #dcfce7; --success-bg: #166534;
+            --danger: #f87171; --danger-fg: #ffffff; --danger-bg: #991b1b;
+            --scrim: rgba(0, 0, 0, 0.6);
+        }
+        
+        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg-default); color: var(--text-default); transition: background-color 0.3s, color 0.3s; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .app-header { background-color: var(--bg-subtle); box-shadow: var(--shadow-sm); border-bottom: 1px solid var(--border-default); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s; border: 1px solid transparent; cursor: pointer; white-space: nowrap; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary { background-color: var(--primary); color: var(--primary-fg); box-shadow: var(--shadow-sm); }
+        .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+        .btn-danger { background-color: var(--danger-bg); color: var(--danger); }
+        .btn-danger:hover:not(:disabled) { background-color: var(--danger); color: var(--danger-fg); }
+        .btn-secondary { background-color: transparent; border-color: var(--border-strong); color: var(--text-subtle); }
+        .btn-secondary:hover:not(:disabled) { background-color: var(--bg-ui); color: var(--text-default); }
+        .btn-tab { color: var(--text-subtle); border-bottom: 2px solid transparent; border-radius: 0; }
+        .btn-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+        .card { background-color: var(--bg-subtle); border-radius: 0.75rem; box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; }
+        .card:hover { transform: translateY(-5px) scale(1.02); box-shadow: var(--shadow-lg); }
+        .modal-overlay { position: fixed; inset: 0; z-index: 50; background-color: var(--scrim); display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-box { background-color: var(--bg-subtle); color: var(--text-default); border-radius: 1rem; box-shadow: var(--shadow-lg); max-width: 95%; width: 500px; max-height: 90vh; display: flex; flex-direction: column; transform: scale(0.95) translateY(10px); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .modal-overlay.visible .modal-box { transform: scale(1) translateY(0); }
+        .form-input, .form-select { width: 100%; border-radius: 0.5rem; border: 1px solid var(--border-strong); background-color: var(--bg-ui); padding: 0.75rem 1rem; font-weight: 500; transition: border-color 0.2s, box-shadow 0.2s; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-bg); }
+    </style>
+</head>
+<body class="antialiased">
+    <? var serverData = { siteConfig: siteConfig, academicYear: academicYear }; ?>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 z-[100] flex-col items-center justify-center bg-[var(--scrim)] hidden"><svg class="animate-spin h-10 w-10 text-[var(--primary)] mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span id="loadingMessage" class="text-lg font-medium text-white"></span></div>
+
+    <!-- Header -->
+    <header class="app-header sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🏫</span>
+                    <div>
+                        <h1 id="headerSiteTitle" class="text-lg font-bold"></h1>
+                        <p id="headerAcademicYear" class="text-sm text-[var(--text-subtle)]"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div id="userInfo" class="hidden items-center gap-3"><span id="userName" class="font-semibold hidden sm:inline"></span><button id="logoutBtn" class="btn btn-danger !py-1.5 !px-3">🚪 ออกจากระบบ</button></div>
+                    <div id="loginSection"><button id="loginBtn" class="btn btn-primary">🔐 เข้าสู่ระบบ</button></div>
+                    <button id="themeToggle" class="btn btn-secondary !p-2 rounded-full" title="สลับธีม"></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal-overlay">
+        <div class="modal-box !w-full !max-w-md">
+            <div class="p-6 relative">
+                 <button id="closeAuthModal" class="btn btn-secondary !p-2 rounded-full absolute top-3 right-3 z-10"><span class="material-symbols-outlined">close</span></button>
+                <div class="flex border-b border-[var(--border-default)] mb-6">
+                    <button id="switchToStudentAuth" type="button" class="btn btn-tab flex-1 !pb-3 active">🎓 สำหรับนักเรียน</button>
+                    <button id="switchToGeneralAuth" type="button" class="btn btn-tab flex-1 !pb-3">👤 สำหรับบุคคลทั่วไป</button>
+                </div>
+                <div id="studentAuthContainer">
+                    <form id="studentLoginForm" class="space-y-4">
+                        <h3 class="font-bold text-lg mb-2 text-center text-[var(--primary)]">🔐 เข้าสู่ระบบ (นักเรียน)</h3>
+                        <div><label for="studentLoginId" class="text-sm font-medium">รหัสประจำตัวนักเรียน</label><input type="text" id="studentLoginId" class="form-input" required></div>
+                        <div><label for="studentLoginPassword" class="text-sm font-medium">รหัสผ่าน</label><input type="password" id="studentLoginPassword" class="form-input" required></div>
+                        <button id="submitStudentLogin" type="button" class="btn btn-primary w-full !py-3">เข้าสู่ระบบ</button>
+                        <p class="text-center text-sm">ยังไม่มีบัญชี? <button type="button" id="showStudentRegister" class="text-[var(--primary)] font-semibold hover:underline">ลงทะเบียนที่นี่</button></p>
+                    </form>
+                    <form id="studentRegisterForm" class="space-y-4 hidden">
+                        <h3 class="font-bold text-lg mb-2 text-center text-[var(--primary)]">📝 ลงทะเบียน (นักเรียน)</h3>
+                        <div><label for="studentRegId" class="text-sm font-medium">รหัสประจำตัวนักเรียน</label><input type="text" id="studentRegId" class="form-input" required></div>
+                        <div><label for="studentRegName" class="text-sm font-medium">ชื่อ-นามสกุล</label><input type="text" id="studentRegName" class="form-input" required></div>
+                        <div><label for="studentRegClass" class="text-sm font-medium">ชั้นเรียน</label><select id="studentRegClass" class="form-select" required><option value="" disabled selected>--- เลือกชั้นเรียน ---</option><option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option><option value="ม.4">ม.4</option><option value="ม.5">ม.5</option><option value="ม.6">ม.6</option></select></div>
+                        <div><label for="studentRegPassword" class="text-sm font-medium">รหัสผ่าน</label><input type="password" id="studentRegPassword" class="form-input" required></div>
+                        <button id="submitStudentRegister" type="button" class="btn btn-primary w-full !py-3">ลงทะเบียน</button>
+                        <p class="text-center text-sm">มีบัญชีแล้ว? <button type="button" id="showStudentLogin" class="text-[var(--primary)] font-semibold hover:underline">เข้าสู่ระบบที่นี่</button></p>
+                    </form>
+                </div>
+                <div id="generalAuthContainer" class="hidden">
+                     <form id="generalLoginForm" class="space-y-4">
+                        <h3 class="font-bold text-lg mb-2 text-center text-[var(--secondary)]">🔐 เข้าสู่ระบบ (บุคคลทั่วไป)</h3>
+                        <div><label for="generalLoginEmail" class="text-sm font-medium">อีเมล</label><input type="email" id="generalLoginEmail" class="form-input" required></div>
+                        <div><label for="generalLoginPassword" class="text-sm font-medium">รหัสผ่าน</label><input type="password" id="generalLoginPassword" class="form-input" required></div>
+                        <button id="submitGeneralLogin" type="button" class="btn btn-primary w-full !py-3">เข้าสู่ระบบ</button>
+                        <p class="text-center text-sm">ยังไม่มีบัญชี? <button type="button" id="showGeneralRegister" class="text-[var(--primary)] font-semibold hover:underline">ลงทะเบียนที่นี่</button></p>
+                    </form>
+                    <form id="generalRegisterForm" class="space-y-4 hidden">
+                        <h3 class="font-bold text-lg mb-2 text-center text-[var(--secondary)]">📝 ลงทะเบียน (บุคคลทั่วไป)</h3>
+                        <div><label for="generalRegName" class="text-sm font-medium">ชื่อ-นามสกุล</label><input type="text" id="generalRegName" class="form-input" required></div>
+                        <div><label for="generalRegEmail" class="text-sm font-medium">อีเมล</label><input type="email" id="generalRegEmail" class="form-input" required></div>
+                        <div><label for="generalRegPassword" class="text-sm font-medium">รหัสผ่าน</label><input type="password" id="generalRegPassword" class="form-input" required></div>
+                        <button id="submitGeneralRegister" type="button" class="btn btn-primary w-full !py-3">ลงทะเบียน</button>
+                        <p class="text-center text-sm">มีบัญชีแล้ว? <button type="button" id="showGeneralLogin" class="text-[var(--primary)] font-semibold hover:underline">เข้าสู่ระบบที่นี่</button></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Registration Confirmation Modal -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-box !w-full !max-w-lg">
+            <div class="flex items-start justify-between p-4 border-b border-[var(--border-default)]">
+                <h3 class="text-xl font-bold text-[var(--primary)]">🔎 ยืนยันการลงทะเบียน</h3>
+            </div>
+            <div class="p-6 space-y-4 overflow-y-auto">
+                <h4 id="confirmClubName" class="text-2xl font-bold"></h4>
+                <div class="text-sm space-y-2 text-[var(--text-subtle)]">
+                    <p>🧑‍🏫 <span class="font-semibold text-[var(--text-default)]">ครูประจำวิชา:</span> <span id="confirmTeacher"></span></p>
+                    <p>📍 <span class="font-semibold text-[var(--text-default)]">สถานที่:</span> <span id="confirmLocation"></span></p>
+                    <p>🗓️ <span class="font-semibold text-[var(--text-default)]">วัน/เวลา:</span> <span id="confirmDateTime"></span></p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="font-semibold text-sm">จำนวนที่รับสมัคร:</label>
+                        <span id="confirmCapacityText" class="font-bold text-sm"></span>
+                    </div>
+                    <div class="w-full bg-[var(--bg-ui)] rounded-full h-4 overflow-hidden border border-[var(--border-strong)]">
+                        <div id="confirmCapacityBar" class="bg-[var(--primary)] h-full rounded-full transition-all duration-500"></div>
+                    </div>
+                </div>
+                <div class="bg-[var(--bg-ui)] p-4 rounded-lg max-h-32 overflow-y-auto">
+                    <p id="confirmDescription" class="text-sm"></p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 p-4 bg-[var(--bg-ui)] border-t border-[var(--border-default)]">
+                <button id="cancelRegBtn" class="btn btn-secondary">ยกเลิก</button>
+                <button id="confirmRegBtn" class="btn btn-primary">✅ ยืนยันการลงทะเบียน</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson Detail Modal -->
+    <div id="lessonModal" class="modal-overlay">
+        <div class="modal-box w-full max-w-2xl">
+            <img id="lessonImage" src="" alt="Club Image" class="w-full h-48 object-cover">
+            <div class="flex items-start justify-between p-4 border-b border-[var(--border-default)]">
+                <div>
+                    <h3 id="lessonClubName" class="text-2xl font-bold text-[var(--primary)]"></h3>
+                    <p id="lessonClubTeacher" class="text-sm text-[var(--text-subtle)]"></p>
+                    <p id="lessonLevel" class="text-xs font-semibold py-1 px-2.5 bg-[var(--bg-ui)] rounded-full inline-block mt-2"></p>
+                </div>
+                <button id="closeLessonModal" class="btn btn-secondary !p-2 rounded-full"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-6 space-y-6 overflow-y-auto max-h-[60vh]">
+                <div class="p-4 rounded-lg bg-[var(--primary-bg)]"><p id="lessonDescription" class="text-[var(--text-default)]"></p></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                    <a id="lessonPlayLink" href="#" target="_blank" class="btn btn-primary !py-3 !text-lg !block hidden"><span class="material-symbols-outlined">play_circle</span> เข้าสู่บทเรียน</a>
+                    <div class="p-3 bg-[var(--bg-ui)] rounded-lg flex items-center justify-center flex-col"><p class="text-sm text-[var(--text-subtle)]">ชั่วโมงเรียน</p><p id="lessonHours" class="font-bold text-2xl text-[var(--primary)]"></p></div>
+                </div>
+                <div><h4 class="font-bold mb-2">📚 หัวข้อบทเรียน</h4><div id="lessonTopics" class="prose prose-sm max-w-none p-4 bg-[var(--bg-ui)] rounded-lg text-[var(--text-default)] space-y-1"></div></div>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a id="lessonSyllabusLink" href="#" target="_blank" class="btn btn-secondary flex-1 !py-2.5 hidden"><span class="material-symbols-outlined">description</span> โครงสร้างรายวิชา</a>
+                    <a id="lessonMaterialsLink" href="#" target="_blank" class="btn btn-secondary flex-1 !py-2.5 hidden"><span class="material-symbols-outlined">folder_zip</span> เอกสารประกอบ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div id="welcomeBanner" class="hidden card !p-6 mb-8 !flex-row items-start justify-between gap-6">
+            <div><h2 class="text-2xl font-bold">👋 ยินดีต้อนรับ, <span id="welcomeName" class="text-[var(--primary)]"></span>!</h2><p class="text-[var(--text-subtle)]">เลือกดูและลงทะเบียนวิชาที่คุณสนใจได้เลย</p></div>
+            <div id="registeredClubSection" class="hidden w-full md:w-auto md:max-w-sm flex-shrink-0">
+                <p class="text-sm mb-2 font-semibold text-[var(--text-subtle)]">รายวิชาที่ลงทะเบียนเรียนแล้ว:</p>
+                <div id="registeredClubList" class="space-y-3"></div>
+            </div>
+        </div>
+        <div class="card !p-6 mb-8"><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" id="searchClub" class="form-input" placeholder="🔎 ค้นหาชื่อวิชา, ครู..."><select id="categoryFilter" class="form-select"><option value="all">ทุกหมวดหมู่</option></select><select id="levelFilter" class="form-select"><option value="all">ทุกระดับชั้น</option></select></div></div>
+        <div id="clubList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="text-center py-8 px-4 text-sm text-[var(--text-subtle)] border-t border-[var(--border-default)] mt-12">
+        <p class="font-semibold text-base text-[var(--text-default)]">ระบบห้องเรียนออนไลน์ครูอาร์เธอร์</p>
+        <p>Developer วิทยา หมายมั่น | ครูอาร์เธอร์</p>
+        <p>ติดต่อ: <a href="https://kruarthurclassroom.blogspot.com/" target="_blank" rel="noopener" class="text-[var(--primary)] hover:underline">kruarthurclassroom.blogspot.com</a></p>
+        <p class="mt-2">© 2025-2026 All Rights Reserved</p>
+    </footer>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed bottom-5 right-5 z-50 flex items-center gap-4 p-4 rounded-lg shadow-lg text-white max-w-sm transition-transform translate-x-[120%]" style="transition-duration: 0.5s;">
+        <span id="notificationIcon" class="text-2xl"></span><p id="notificationMessage" class="font-semibold"></p>
+    </div>
+
+    <!-- Templates -->
+    <template id="clubCardTemplate">
+        <div class="card">
+            <div class="relative"><img class="aspect-video w-full object-cover" src="" alt="Club Image"><div class="absolute top-3 right-3 text-xs font-bold py-1 px-3 rounded-full"></div></div>
+            <div class="p-5 flex flex-col flex-grow">
+                <div class="flex flex-wrap gap-2 mb-2"><span class="tag-category text-xs font-semibold py-1 px-2.5 rounded-full"></span><span class="tag-level text-xs font-semibold py-1 px-2.5 rounded-full"></span></div>
+                <h3 class="text-lg font-bold text-[var(--primary)]"></h3>
+                <p class="desc-text text-sm text-[var(--text-subtle)] flex-grow min-h-[40px]"></p>
+                <div class="mt-auto pt-4 border-t border-[var(--border-default)] space-y-2">
+                    <p class="teacher-info text-sm text-[var(--text-subtle)]"></p>
+                    <div class="flex justify-between items-center">
+                        <p class="location-info text-sm text-[var(--text-subtle)]"></p>
+                        <p class="capacity-info font-semibold text-sm py-1 px-3 rounded-full"></p>
+                    </div>
+                    <button class="btn w-full mt-2"></button>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <script>
+    // --- 🚀 GLOBAL STATE & CONFIG 🚀 ---
+    let allClubs = [], filteredClubs = [];
+    let currentUser = null; // { id, name, class?, registeredClub: [...], userType: 'student' | 'general' }
+    const serverConfig = <?!= JSON.stringify(serverData.siteConfig) ?>;
+    const academicYear = <?!= serverData.academicYear ?>;
+    const elements = {};
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        cacheElements();
+        applySiteConfiguration();
+        setupEventListeners();
+        checkTheme();
+        showLoadingState(true, 'กำลังโหลดข้อมูล...');
+        google.script.run.withSuccessHandler(handleInitialData).withFailureHandler(handleGasError).getClubs();
+    });
+
+    function cacheElements() {
+        const ids = ['loadingOverlay','loadingMessage','headerSiteTitle','headerAcademicYear','themeToggle','userInfo','userName','logoutBtn','loginSection','loginBtn','authModal','closeAuthModal','switchToStudentAuth','switchToGeneralAuth','studentAuthContainer','generalAuthContainer','studentLoginForm','studentLoginId','studentLoginPassword','submitStudentLogin','showStudentRegister','studentRegisterForm','studentRegId','studentRegName','studentRegClass','studentRegPassword','submitStudentRegister','showStudentLogin','generalLoginForm','generalLoginEmail','generalLoginPassword','submitGeneralLogin','showGeneralRegister','generalRegisterForm','generalRegName','generalRegEmail','generalRegPassword','submitGeneralRegister','showGeneralLogin','welcomeBanner','welcomeName','registeredClubSection','registeredClubList','searchClub','categoryFilter','levelFilter','clubList','notification','notificationIcon','notificationMessage','clubCardTemplate','lessonModal','closeLessonModal','lessonImage','lessonClubName','lessonClubTeacher','lessonLevel','lessonDescription','lessonPlayLink','lessonHours','lessonTopics','lessonSyllabusLink','lessonMaterialsLink','confirmModal','confirmClubName','confirmTeacher','confirmLocation','confirmDateTime','confirmCapacityText','confirmCapacityBar','confirmDescription','cancelRegBtn','confirmRegBtn'];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) elements[id] = el;
+        });
+    }
+    
+    function applySiteConfiguration() {
+        elements.headerSiteTitle.textContent = serverConfig.siteTitle;
+        elements.headerAcademicYear.textContent = `${serverConfig.academicYearPrefix} ${serverConfig.academicYearNumber || academicYear}`;
+        document.title = serverConfig.siteTitle;
+    }
+
+    function checkTheme() {
+        const isDark = localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', isDark);
+        elements.themeToggle.innerHTML = `<span class="material-symbols-outlined">${isDark ? 'light_mode' : 'dark_mode'}</span>`;
+    }
+
+    function setupEventListeners() {
+        elements.themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            checkTheme();
+        });
+        elements.loginBtn.addEventListener('click', () => {
+            toggleAuthView('student');
+            elements.authModal.classList.add('visible');
+        });
+        elements.closeAuthModal.addEventListener('click', () => elements.authModal.classList.remove('visible'));
+        elements.logoutBtn.addEventListener('click', handleLogout);
+        elements.switchToStudentAuth.addEventListener('click', () => toggleAuthView('student'));
+        elements.switchToGeneralAuth.addEventListener('click', () => toggleAuthView('general'));
+        elements.showStudentRegister.addEventListener('click', () => toggleFormVisibility('student', true));
+        elements.showStudentLogin.addEventListener('click', () => toggleFormVisibility('student', false));
+        elements.showGeneralRegister.addEventListener('click', () => toggleFormVisibility('general', true));
+        elements.showGeneralLogin.addEventListener('click', () => toggleFormVisibility('general', false));
+        elements.submitStudentLogin.addEventListener('click', handleStudentLogin);
+        elements.submitStudentRegister.addEventListener('click', handleStudentRegister);
+        elements.submitGeneralLogin.addEventListener('click', handleGeneralLogin);
+        elements.submitGeneralRegister.addEventListener('click', handleGeneralRegister);
+        elements.searchClub.addEventListener('input', debounce(applyFiltersAndRenderClubs));
+        elements.categoryFilter.addEventListener('change', applyFiltersAndRenderClubs);
+        elements.levelFilter.addEventListener('change', applyFiltersAndRenderClubs);
+        elements.closeLessonModal.addEventListener('click', () => elements.lessonModal.classList.remove('visible'));
+        elements.cancelRegBtn.addEventListener('click', () => elements.confirmModal.classList.remove('visible'));
+        elements.confirmRegBtn.addEventListener('click', () => {
+            const clubId = parseInt(elements.confirmRegBtn.dataset.clubId, 10);
+            elements.confirmModal.classList.remove('visible');
+            handleRegisterForClub(clubId);
+        });
+    }
+
+    function handleInitialData(clubsData) {
+        showLoadingState(false);
+        if (clubsData?.error) return handleGasError(clubsData);
+        allClubs = clubsData;
+        populateFilters();
+        applyFiltersAndRenderClubs();
+    }
+
+    // --- UI Update Functions ---
+    function updateUIForUser() {
+        if (currentUser) {
+            elements.loginSection.classList.add('hidden');
+            elements.userInfo.classList.remove('hidden');
+            elements.userName.textContent = currentUser.name;
+            elements.welcomeBanner.classList.remove('hidden');
+            elements.welcomeName.textContent = currentUser.name;
+            updateRegisteredClubUI();
+        } else {
+            elements.loginSection.classList.remove('hidden');
+            elements.userInfo.classList.add('hidden');
+            elements.welcomeBanner.classList.add('hidden');
+            elements.registeredClubSection.classList.add('hidden');
+        }
+        applyFiltersAndRenderClubs();
+    }
+    
+    function updateRegisteredClubUI() {
+        elements.registeredClubList.innerHTML = '';
+        const hasRegs = currentUser?.registeredClub?.length > 0;
+        elements.registeredClubSection.classList.toggle('hidden', !hasRegs);
+        if (!hasRegs) return;
+        
+        currentUser.registeredClub.forEach(clubId => {
+            const club = allClubs.find(c => c.id === clubId);
+            if (!club) return;
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-between gap-3 bg-[var(--bg-ui)] p-2 rounded-md';
+            div.innerHTML = `<span class="font-semibold text-sm text-[var(--primary)] truncate" title="${club.name}">${club.name}</span>
+                             <div class="flex gap-2">
+                                <button class="btn-lesson btn btn-primary !py-1 !px-2 !text-xs">🎓 ห้องเรียน</button>
+                                <button class="btn-cancel btn btn-danger !py-1 !px-2 !text-xs">❌ ยกเลิก</button>
+                             </div>`;
+            div.querySelector('.btn-lesson').addEventListener('click', () => showLessonModal(club));
+            div.querySelector('.btn-cancel').addEventListener('click', () => handleCancelRegistration(club.id, club.name));
+            elements.registeredClubList.appendChild(div);
+        });
+    }
+
+    function populateFilters() {
+        const categories = [...new Set(allClubs.map(c => c.category).filter(Boolean))];
+        const levels = [...new Set(allClubs.map(c => c.level).filter(Boolean))];
+        categories.forEach(cat => elements.categoryFilter.add(new Option(getCategoryName(cat), cat)));
+        levels.forEach(lvl => elements.levelFilter.add(new Option(getLevelName(lvl), lvl)));
+    }
+
+    function applyFiltersAndRenderClubs() {
+        const search = elements.searchClub.value.toLowerCase();
+        const category = elements.categoryFilter.value;
+        const level = elements.levelFilter.value;
+        filteredClubs = allClubs.filter(c => 
+            (search === '' || c.name.toLowerCase().includes(search) || c.teacher.toLowerCase().includes(search)) &&
+            (category === 'all' || c.category === category) &&
+            (level === 'all' || c.level === level)
+        );
+        renderClubs();
+    }
+
+    function renderClubs() {
+        elements.clubList.innerHTML = '';
+        if (filteredClubs.length === 0) {
+            elements.clubList.innerHTML = `<div class="text-center text-[var(--text-subtle)] md:col-span-3 card !p-10">🚫 ไม่พบวิชาที่ตรงตามเงื่อนไข</div>`;
+            return;
+        }
+        const fragment = document.createDocumentFragment();
+        filteredClubs.forEach(club => {
+            const card = elements.clubCardTemplate.content.cloneNode(true).firstElementChild;
+            const isRegistered = currentUser?.registeredClub.includes(club.id);
+            const isFull = club.registered >= club.capacity;
+            
+            card.querySelector('img').src = club.image || serverConfig.defaultClubImageURL;
+            card.querySelector('h3').textContent = club.name;
+            card.querySelector('.desc-text').textContent = club.description;
+            card.querySelector('.teacher-info').innerHTML = `🧑‍🏫 <span class="font-medium">อ. ${club.teacher || '-'}</span>`;
+            card.querySelector('.location-info').innerHTML = `📍 <span class="font-medium">${club.location || '-'}</span>`;
+            
+            const badge = card.querySelector('.absolute');
+            if (isRegistered) { badge.textContent = '✅ ลงทะเบียนแล้ว'; badge.className += ' bg-[var(--primary)] text-[var(--primary-fg)]'; }
+            else if (isFull) { badge.textContent = '⚠️ เต็มแล้ว'; badge.className += ' bg-amber-400 text-amber-900'; }
+            else { badge.remove(); }
+            
+            card.querySelector('.tag-category').textContent = getCategoryName(club.category);
+            card.querySelector('.tag-category').className += ' bg-[var(--secondary-bg)] text-[var(--secondary)]';
+            card.querySelector('.tag-level').textContent = getLevelName(club.level);
+            card.querySelector('.tag-level').className += ' bg-[var(--bg-ui)] text-[var(--text-subtle)]';
+
+            const availability = card.querySelector('.capacity-info');
+            availability.textContent = `${club.registered}/${club.capacity}`;
+            availability.className += isFull ? ' bg-[var(--danger-bg)] text-[var(--danger)]' : ' bg-[var(--success-bg)] text-[var(--success)]';
+
+            const button = card.querySelector('button');
+            button.disabled = !currentUser || (isFull && !isRegistered);
+            if (!currentUser) { button.textContent = '🔐 กรุณาเข้าสู่ระบบ'; }
+            else if (isRegistered) { button.textContent = '🎓 เข้าสู่ห้องเรียน'; button.className += ' btn-primary'; button.addEventListener('click', () => showLessonModal(club)); }
+            else if (isFull) { button.textContent = 'เต็มแล้ว'; }
+            else { button.textContent = '📝 ลงทะเบียน'; button.className += ' btn-primary'; button.addEventListener('click', () => showConfirmationModal(club)); }
+            
+            fragment.appendChild(card);
+        });
+        elements.clubList.appendChild(fragment);
+    }
+
+    // --- Auth & Action Handlers ---
+    function handleLogout() { currentUser = null; updateUIForUser(); showNotification('info', 'ออกจากระบบเรียบร้อย'); }
+    
+    function toggleAuthView(view) {
+        const isStudent = view === 'student';
+        elements.studentAuthContainer.classList.toggle('hidden', !isStudent);
+        elements.generalAuthContainer.classList.toggle('hidden', isStudent);
+        elements.switchToStudentAuth.classList.toggle('active', isStudent);
+        elements.switchToGeneralAuth.classList.toggle('active', !isStudent);
+        toggleFormVisibility('student', false);
+        toggleFormVisibility('general', false);
+    }
+
+    function toggleFormVisibility(type, showRegister) {
+        if (type === 'student') {
+            elements.studentLoginForm.classList.toggle('hidden', showRegister);
+            elements.studentRegisterForm.classList.toggle('hidden', !showRegister);
+        } else {
+            elements.generalLoginForm.classList.toggle('hidden', showRegister);
+            elements.generalRegisterForm.classList.toggle('hidden', !showRegister);
+        }
+    }
+
+    function handleStudentLogin() {
+        const payload = { id: elements.studentLoginId.value, password: elements.studentLoginPassword.value };
+        if (!payload.id || !payload.password) return showNotification('error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+        showLoadingState(true, 'กำลังเข้าสู่ระบบ...');
+        google.script.run.withSuccessHandler(handleAuthSuccess).withFailureHandler(handleGasError).loginStudent(payload.id, payload.password);
+    }
+
+    function handleStudentRegister() {
+        const payload = { id: elements.studentRegId.value, name: elements.studentRegName.value, class: elements.studentRegClass.value, password: elements.studentRegPassword.value };
+        if (!payload.id || !payload.name || !payload.class || !payload.password) return showNotification('error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+        showLoadingState(true, 'กำลังลงทะเบียน...');
+        google.script.run.withSuccessHandler(handleAuthSuccess).withFailureHandler(handleGasError).registerStudent(payload);
+    }
+    
+    function handleGeneralLogin() {
+        const payload = { email: elements.generalLoginEmail.value, password: elements.generalLoginPassword.value };
+        if (!payload.email || !payload.password) return showNotification('error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+        showLoadingState(true, 'กำลังเข้าสู่ระบบ...');
+        google.script.run.withSuccessHandler(handleAuthSuccess).withFailureHandler(handleGasError).loginGeneralUser(payload.email, payload.password);
+    }
+    
+    function handleGeneralRegister() {
+        const payload = { name: elements.generalRegName.value, email: elements.generalRegEmail.value, password: elements.generalRegPassword.value };
+        if (!payload.name || !payload.email || !payload.password) return showNotification('error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+        showLoadingState(true, 'กำลังลงทะเบียน...');
+        google.script.run.withSuccessHandler(handleAuthSuccess).withFailureHandler(handleGasError).registerGeneralUser(payload);
+    }
+
+    function handleAuthSuccess(result) {
+        showLoadingState(false);
+        if (result?.error) return showNotification('error', result.error);
+        currentUser = result;
+        if (!Array.isArray(currentUser.registeredClub)) currentUser.registeredClub = [];
+        elements.authModal.classList.remove('visible');
+        updateUIForUser();
+        showNotification('success', `ยินดีต้อนรับ, ${currentUser.name}!`);
+    }
+
+    function handleRegisterForClub(clubId) {
+        if (!currentUser) return;
+        showLoadingState(true, 'กำลังลงทะเบียน...');
+        google.script.run.withSuccessHandler(handleRegClubSuccess).withFailureHandler(handleGasError).registerForClub(currentUser.id, clubId, currentUser.userType);
+    }
+
+    function handleCancelRegistration(clubId, clubName) {
+        if (!currentUser || !confirm(`ยืนยันการยกเลิก "${clubName}"?`)) return;
+        showLoadingState(true, 'กำลังยกเลิก...');
+        google.script.run.withSuccessHandler(handleCancelClubSuccess).withFailureHandler(handleGasError).cancelClubRegistration(currentUser.id, clubId, currentUser.userType);
+    }
+    
+    function handleRegClubSuccess(result){
+        showLoadingState(false);
+        if (result?.error) return handleGasError(result);
+        currentUser.registeredClub = result.allUserClubs;
+        updateLocalClubData(result.updatedClubData);
+        updateUIForUser();
+        showNotification('success', 'ลงทะเบียนสำเร็จ!');
+    }
+    
+    function handleCancelClubSuccess(result){
+        showLoadingState(false);
+        if (result?.error) return handleGasError(result);
+        currentUser.registeredClub = result.remainingUserClubs;
+        updateLocalClubData(result.updatedClubData);
+        updateUIForUser();
+        showNotification('info', 'ยกเลิกการลงทะเบียนแล้ว');
+    }
+    
+    function updateLocalClubData(data) {
+        if (!data?.id) return;
+        const index = allClubs.findIndex(c => c.id === data.id);
+        if (index > -1) allClubs[index] = { ...allClubs[index], ...data };
+    }
+
+    // --- Modal & Helper Functions ---
+    function showConfirmationModal(club) {
+        elements.confirmClubName.textContent = club.name;
+        elements.confirmTeacher.textContent = club.teacher;
+        elements.confirmLocation.textContent = club.location;
+        elements.confirmDateTime.textContent = `${club.day || '-'} / ${club.time || '-'}`;
+        elements.confirmDescription.textContent = club.description;
+        elements.confirmCapacityText.textContent = `${club.registered} / ${club.capacity} คน`;
+        const percentage = club.capacity > 0 ? (club.registered / club.capacity) * 100 : 0;
+        elements.confirmCapacityBar.style.width = `${percentage}%`;
+        elements.confirmRegBtn.dataset.clubId = club.id;
+        elements.confirmModal.classList.add('visible');
+    }
+    
+    function showLessonModal(club) {
+        if (!club) return;
+        elements.lessonImage.src = club.image || serverConfig.defaultClubImageURL;
+        elements.lessonClubName.textContent = club.name;
+        elements.lessonClubTeacher.textContent = `ครูประจำวิชา: ${club.teacher}`;
+        elements.lessonLevel.textContent = `👥 ${getLevelName(club.level)}`;
+        elements.lessonDescription.textContent = club.description;
+        elements.lessonHours.textContent = club.hours || '-';
+        elements.lessonTopics.innerHTML = club.topics || 'ไม่มีข้อมูล';
+        updateLinkButton(elements.lessonPlayLink, club.playLink, true);
+        updateLinkButton(elements.lessonSyllabusLink, club.syllabusPdf);
+        updateLinkButton(elements.lessonMaterialsLink, club.materialsPdf);
+        elements.lessonModal.classList.add('visible');
+    }
+
+    function updateLinkButton(button, link) {
+        if (link && link.startsWith('http')) {
+            button.href = link;
+            button.classList.remove('hidden');
+        } else {
+            button.classList.add('hidden');
+        }
+    }
+    
+    const debounce = (func, wait = 300) => { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); }; };
+    const getCategoryName = (c) => ({ academic: 'วิชาการ', sports: 'กีฬา', arts: 'ศิลปะ', music: 'ดนตรี', language: 'ภาษา', volunteer: 'จิตอาสา' }[c] || c || 'ไม่ระบุ');
+    const getLevelName = (l) => ({ junior: 'ม.ต้น', senior: 'ม.ปลาย', 'all-levels': 'ทุกระดับ' }[l] || l || 'ทุกระดับ');
+    
+    function showLoadingState(isLoading, message = '') {
+        elements.loadingMessage.textContent = message;
+        elements.loadingOverlay.style.display = isLoading ? 'flex' : 'none';
+    }
+    
+    let notificationTimeout;
+    function showNotification(type, message) {
+        const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+        const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500' };
+        elements.notification.className = `fixed bottom-5 right-5 z-50 flex items-center gap-4 p-4 rounded-lg shadow-lg text-white max-w-sm transition-transform ${colors[type]}`;
+        elements.notificationIcon.textContent = icons[type];
+        elements.notificationMessage.textContent = message;
+        elements.notification.style.transform = 'translateX(0)';
+        clearTimeout(notificationTimeout);
+        notificationTimeout = setTimeout(() => { elements.notification.style.transform = 'translateX(120%)'; }, 4000);
+    }
+    
+    function handleGasError(error) {
+        showLoadingState(false);
+        const message = error?.error || (typeof error === 'string' ? error : "เกิดข้อผิดพลาดที่ไม่คาดคิด");
+        showNotification('error', message);
+        console.error("Server Error:", error);
+    }
+    </script>
+</body>
+</html>
