@@ -292,6 +292,7 @@
         <footer class="text-center py-8 px-4 text-sm text-[var(--text-subtle)] border-t border-[var(--border-default)] mt-12">
             <p class="font-semibold text-base text-[var(--text-default)]">ระบบห้องเรียนวรรณคดีไทย</p>
             <p>Developer วิทยา หมายมั่น | ครูอาร์เธอร์</p>
+            <p>อาจารย์ที่ปรึกษา: อาจารย์ประทุมเพชร แซ่อ๋อง</p>
             <p>ติดต่อ: <a href="https://kruarthurclassroom.blogspot.com/" target="_blank" rel="noopener" class="text-[var(--primary)] hover:underline">kruarthurclassroom.blogspot.com</a></p>
             <p class="mt-2">© 2025-2026 All Rights Reserved</p>
         </footer>
@@ -1284,20 +1285,22 @@ function showLessonModal(club) {
                 { bloom: 'เข้าใจ', question: 'รัชกาลที่ ๒ เสด็จสวรรคตด้วยสาเหตุใด?', options: ['ถูกลอบปลงพระชนม์', 'ประชวรด้วยโรคพิษไข้', 'สิ้นพระชนม์ในสนามรบ', 'อุบัติเหตุจากการทรงม้า'], correctAnswer: 1, explanation: 'สวรรคตด้วยโรคพิษไข้ เมื่อ พ.ศ. 2367' }
             ]
         },
-        {
+      {
             id: 3,
             title: 'สรุปเนื้อเรื่อง',
             emoji: '🎬',
             content: `
                 <div class="space-y-4">
                     <h3 class="text-2xl font-bold text-sky-500 font-heading">⚔️ ศึกกะหมังกุหนิง</h3>
-                    <div class="relative w-full pb-[56.25%] bg-sky-50 rounded-[2rem] overflow-hidden shadow-sm border-[3px] border-sky-200 flex items-center justify-center group">
-                        <div class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-sky-100 to-white z-10 cursor-pointer hover:bg-sky-50 transition-colors">
-                            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                                <span class="text-4xl ml-1">▶️</span>
-                            </div>
-                            <p class="text-sky-600 mt-4 font-heading font-medium">คลิกเพื่อเล่นวิดีโอสรุปเนื้อเรื่อง</p>
-                        </div>
+                    
+                    <div class="relative w-full pb-[56.25%] bg-sky-50 rounded-[2rem] overflow-hidden shadow-sm border-[3px] border-sky-200">
+                        <iframe class="absolute top-0 left-0 w-full h-full rounded-[1.5rem]" 
+                            src="https://www.youtube.com/embed/hMSIolOpgIA" 
+                            title="YouTube video player" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                        </iframe>
                     </div>
                     
                     <button onclick="openImageModal('แผนที่และเส้นทางการรบ', 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1200&q=80', 'แผนที่จำลองอาณาจักรต่างๆ ในเรื่องอิเหนา เช่น กุเรปัน ดาหา กาหลัง และสิงหัดส่าหรี')" class="mt-4 w-full bg-sky-50 hover:bg-sky-100 border-2 border-dashed border-sky-300 text-sky-700 py-3 rounded-2xl font-heading font-medium flex items-center justify-center gap-2 transition-colors">
