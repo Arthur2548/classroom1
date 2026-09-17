@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แชทบอทหนุมาน - ทหารเอกแห่งพระราม</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        kanit: ['Kanit', 'sans-serif'],
+                        sarabun: ['Sarabun', 'sans-serif'],
+                    },
+                    colors: {
+                        mythGold: '#d97706',
+                        mythDark: '#0f172a',
+                        mythCrimson: '#991b1b',
+                        mythFlame: '#ea580c',
+                    },
+                    animation: {
+                        'float': 'floatUpDown 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        floatUpDown: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+        }
+        h1, h2, h3, .font-kanit {
+            font-family: 'Kanit', sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d97706;
+            border-radius: 3px;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(217, 119, 6, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(234, 88, 12, 0.7); }
+        }
+        .hanuman-glow {
+            animation: pulseGlow 3s infinite;
+        }
+        canvas#emberCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="h-full bg-slate-950 text-slate-100 flex flex-col overflow-hidden relative">
+
+    <div id="intro-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md transition-opacity duration-500">
+        <!-- Step 1: Name Input -->
+        <div id="name-step" class="bg-slate-900 border-2 border-amber-500/50 rounded-3xl p-8 max-w-md w-[90%] shadow-[0_0_40px_rgba(217,119,6,0.3)] text-center transform transition-all duration-300 scale-100 opacity-100 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle, #d97706 1px, transparent 1px); background-size: 20px 20px;"></div>
+            <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-2 border-amber-400 hanuman-glow bg-white/10 relative z-10">
+                <img src="hanuman-logo.png" alt="พี่หนุมาน Logo" class="w-full h-full object-cover">
+            </div>
+            <h2 class="text-2xl font-kanit font-bold text-amber-400 mb-2 relative z-10">ยินดีต้อนรับสู่พลับพลา</h2>
+            <p class="text-slate-300 text-sm mb-6 relative z-10">ก่อนจะคุยกับพี่หนุมาน น้องมีชื่อว่าอะไรฮะ?</p>
+            <input type="text" id="user-name-input" placeholder="พิมพ์ชื่อของน้องที่นี่..." class="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-amber-500 mb-5 text-center relative z-10" onkeypress="if(event.key === 'Enter') submitName()">
+            <button onclick="submitName()" class="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold py-3 rounded-xl transition shadow-lg font-kanit relative z-10">
+                ยืนยันชื่อ
+            </button>
+        </div>
+
+        <!-- Step 2: Welcome Message -->
+        <div id="welcome-step" class="hidden flex-col items-center justify-center w-[90%] max-w-lg transform transition-all duration-700 translate-y-10 opacity-0 relative">
+            <div class="relative z-20 h-[420px] mb-[-60px] animate-float flex justify-center w-full">
+                <!-- เอฟเฟกต์แสงออร่า -->
+                <div class="absolute top-1/4 w-3/4 h-3/4 bg-amber-500/40 rounded-full blur-[80px] animate-pulse pointer-events-none" style="animation-duration: 2.5s;"></div>
+                <div class="absolute top-1/3 w-1/2 h-1/2 bg-yellow-300/30 rounded-full blur-[60px] hanuman-glow pointer-events-none"></div>
+                <img src="Hanuman1.png" alt="พี่หนุมาน" class="relative z-10 h-full w-auto object-contain drop-shadow-[0_0_40px_rgba(245,158,11,0.6)]">
+            </div>
+            <div class="relative z-10 bg-slate-800/95 border-2 border-amber-500/80 rounded-3xl p-6 md:p-8 pt-16 text-center shadow-[0_0_50px_rgba(217,119,6,0.3)] backdrop-blur-xl w-full overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-amber-900/30 to-transparent pointer-events-none"></div>
+                <p id="welcome-message" class="text-slate-100 text-base md:text-lg leading-relaxed font-sarabun mb-6 relative z-10">
+                    <!-- Text injected via JS -->
+                </p>
+                <button onclick="closeIntro()" class="relative z-10 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold px-8 py-3 rounded-xl transition shadow-[0_0_20px_rgba(245,158,11,0.5)] font-kanit transform hover:scale-105 duration-200 flex items-center justify-center mx-auto gap-2">
+                    เริ่มพูดคุยเลย! <i class="fa-solid fa-comment-dots"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Diagram Modal (Fullscreen Zoom) -->
+    <div id="diagram-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-950/95 backdrop-blur-md transition-opacity duration-300 opacity-0">
+        <!-- Toolbar ซูม -->
+        <div class="absolute top-4 right-4 flex gap-2 z-50">
+            <button onclick="zoomDiagram(0.2)" class="w-10 h-10 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-full border border-slate-600 shadow-lg flex items-center justify-center text-xl" title="ซูมเข้า">
+                <i class="fa-solid fa-magnifying-glass-plus"></i>
+            </button>
+            <button onclick="zoomDiagram(-0.2)" class="w-10 h-10 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-full border border-slate-600 shadow-lg flex items-center justify-center text-xl" title="ซูมออก">
+                <i class="fa-solid fa-magnifying-glass-minus"></i>
+            </button>
+            <button onclick="resetZoom()" class="w-10 h-10 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-full border border-slate-600 shadow-lg flex items-center justify-center text-lg" title="คืนขนาดเดิม">
+                <i class="fa-solid fa-compress"></i>
+            </button>
+            <button onclick="closeDiagramModal()" class="w-10 h-10 bg-amber-600 hover:bg-amber-500 text-slate-900 rounded-full border border-amber-400 shadow-lg flex items-center justify-center text-xl ml-4" title="ปิดหน้าต่าง">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        
+        <!-- Content Container -->
+        <div class="w-full h-full overflow-auto flex items-center justify-center p-4">
+            <div id="diagram-modal-content" class="transition-transform duration-200 origin-center bg-slate-900/50 p-4 rounded-xl border border-amber-500/20 shadow-[0_0_50px_rgba(245,158,11,0.1)]">
+                <!-- SVG จะถูกดึงมาใส่ในนี้เมื่อคลิกขยาย -->
+            </div>
+        </div>
+    </div>
+
+    <canvas id="emberCanvas"></canvas>
+
+    <header class="relative z-10 bg-gradient-to-r from-slate-900 via-mythCrimson/50 to-slate-900 border-b border-amber-500/40 p-4 shadow-2xl flex items-center justify-between shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-full border-2 border-amber-500 flex items-center justify-center hanuman-glow overflow-hidden bg-white/10">
+                <img src="hanuman-logo.png" alt="พี่หนุมาน AI Logo" class="w-full h-full object-cover">
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-wide text-amber-400 flex items-center gap-2 font-kanit">
+                    พี่หนุมาน AI <span class="text-xs bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">พลับพลา 5G</span>
+                </h1>
+                <p class="text-xs text-slate-300">ทหารเอกแห่งองค์พระราม วัยรุ่นลงกา เฟรนลี่ มีฤทธิ์เผาเมือง</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="clearChat()" class="text-xs bg-slate-800/80 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">เริ่มแชทใหม่</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="relative z-10 flex-1 flex max-w-6xl w-full mx-auto p-3 md:p-6 overflow-hidden gap-4 md:gap-8">
+        
+        <!-- Left Side: Chat Interface -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
+            
+            <!-- Template Messages Box -->
+            <div class="bg-slate-900/80 backdrop-blur-sm border border-slate-700/80 rounded-2xl p-3 mb-3 shrink-0 shadow-lg flex flex-col gap-3">
+                
+                <!-- หมวดหมู่: เล่าวรรณคดีไทย -->
+                <div>
+                    <p class="text-xs text-amber-400 mb-2 font-kanit flex items-center gap-1.5">
+                        <i class="fa-solid fa-book-open"></i> เล่าวรรณคดีไทย 
+                        <span class="text-slate-400 font-sarabun text-[10px] ml-1">(หรือเรื่องอื่นๆ น้องๆ พิมพ์บอกพี่หนุมานได้เลยนะ)</span>
+                    </p>
+                    <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                        <button onclick="sendQuickPrompt('พี่หนุมาน เล่าเรื่อง พระอภัยมณี ให้ฟังหน่อยฮะ')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm">🌊 พระอภัยมณี</button>
+                        <button onclick="sendQuickPrompt('พี่หนุมาน เล่าเรื่อง รามเกียรติ์ ให้ฟังหน่อยฮะ')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm">🐒 รามเกียรติ์</button>
+                        <button onclick="sendQuickPrompt('พี่หนุมาน เล่าเรื่อง อิเหนา ให้ฟังหน่อยฮะ')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm">🗡️ อิเหนา</button>
+                        <button onclick="sendQuickPrompt('พี่หนุมาน เล่าเรื่อง สามก๊ก ให้ฟังหน่อยฮะ')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm">🐉 สามก๊ก</button>
+                        <button onclick="sendQuickPrompt('พี่หนุมาน เล่าเรื่อง ขุนช้างขุนแผน ให้ฟังหน่อยฮะ')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm">🐘 ขุนช้างขุนแผน</button>
+                    </div>
+                </div>
+
+                <!-- หมวดหมู่: คำถามยอดฮิต -->
+                <div>
+                    <p class="text-xs text-amber-400 mb-2 font-kanit flex items-center gap-1.5">
+                        <i class="fa-solid fa-comment-dots"></i> คำถามยอดฮิต
+                    </p>
+                    <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                        <button onclick="sendQuickPrompt('สรุปเรื่อง ', false)" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-slate-200 hover:text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm">📝 สรุปเรื่อง...ให้หน่อย</button>
+                        <button onclick="sendQuickPrompt('พระรามคือใคร?')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-slate-200 hover:text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm">👑 พระรามคือใคร</button>
+                        <button onclick="sendQuickPrompt('วรรณคดีที่ได้รับการยกย่องมีเรื่องใดบ้าง?')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-slate-200 hover:text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm">🏆 วรรณคดียกย่อง</button>
+                        <button onclick="sendQuickPrompt('พระอภัยมณีหนีนางยักษ์ทำไม?')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-slate-200 hover:text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm">🏃 พระอภัยมณีหนียักษ์</button>
+                        <button onclick="sendQuickPrompt('ทำไมทศกัณฐ์ถึงมี 10 หน้า 20 มือ?')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-slate-200 hover:text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm">👺 ทศกัณฐ์ 10 หน้า</button>
+                        
+                        <button onclick="sendQuickPrompt('พี่หนุมานอมพลับพลาตอนไหน?')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-slate-200 hover:text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm">⛺ หนุมานอมพลับพลา</button>
+                        <button onclick="sendQuickPrompt('เล่าประวัติสุนทรภู่ให้ฟังหน่อย')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-slate-200 hover:text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm">🖋️ ประวัติสุนทรภู่</button>
+                        <button onclick="sendQuickPrompt('สุนทรภู่เป่าปี่หรือเป่าขลุ่ย?')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-slate-200 hover:text-amber-300 text-[11px] px-3 py-1.5 rounded-lg border border-slate-600 hover:border-amber-500/50 transition shadow-sm border-amber-500/50">🎵 สุนทรภู่เป่าปี่หรือขลุ่ย?</button>
+                        
+                        <!-- Mermaid Chart Buttons -->
+                        <button onclick="sendQuickPrompt('พี่หนุมาน ช่วยทำไทม์ไลน์เหตุการณ์ในศึกลงกาให้ดูหน่อยฮะ')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-amber-300 hover:text-amber-200 text-[11px] px-3 py-1.5 rounded-lg border border-amber-600 hover:border-amber-400 transition shadow-sm shadow-amber-900/50">⏳ ไทม์ไลน์ศึกลงกา</button>
+                        <button onclick="sendQuickPrompt('พี่หนุมาน ช่วยวาดผังตระกูลของทศกัณฐ์ให้ดูหน่อยฮะ')" class="shrink-0 bg-slate-800 hover:bg-amber-500/20 text-amber-300 hover:text-amber-200 text-[11px] px-3 py-1.5 rounded-lg border border-amber-600 hover:border-amber-400 transition shadow-sm shadow-amber-900/50">🌳 ผังตระกูลทศกัณฐ์</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Container -->
+            <div id="chat-container" class="flex-1 bg-slate-900/80 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 md:p-6 overflow-y-auto space-y-4 shadow-2xl flex flex-col">
+                <!-- ข้อความแชทจะถูกเพิ่มที่นี่ -->
+            </div>
+
+            <div id="typing-indicator" class="hidden items-center space-x-2 text-xs text-amber-400/90 py-2 px-1 mt-2">
+                <i class="fa-solid fa-fire animate-bounce text-amber-500"></i>
+                <span>พี่หนุมานกำลังเหาะเหิรเดินอากาศกลับมาตอบ...</span>
+            </div>
+
+            <div class="mt-3 shrink-0">
+                <form id="chat-form" onsubmit="handleSendMessage(event)" class="flex items-center gap-2 bg-slate-900/90 border border-slate-700/80 rounded-2xl p-2 shadow-2xl focus-within:border-amber-500 transition">
+                    <input 
+                        type="text" 
+                        id="user-input" 
+                        placeholder="พิมพ์ข้อความคุยกับพี่หนุมานที่นี่..." 
+                        class="flex-1 bg-transparent border-none outline-none text-slate-100 placeholder-slate-500 px-3 text-sm"
+                        autocomplete="off"
+                        required
+                    >
+                    <button 
+                        type="submit" 
+                        id="send-btn"
+                        class="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-semibold px-5 py-2.5 rounded-xl text-sm transition shadow-lg flex items-center gap-2 font-kanit">
+                        <span>ส่งข้อความ</span>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+                <div class="text-center mt-2 text-[11px] text-slate-500">
+                    ขับเคลื่อนด้วย Gemini AI • สวมบทบาทพี่หนุมาน วัยรุ่นลงกา
+                </div>
+            </div>
+        </div> 
+
+        <!-- Right Side: Hanuman Character Image -->
+        <div class="hidden md:flex flex-col justify-end w-[250px] lg:w-[350px] shrink-0 relative pointer-events-none">
+            <div class="absolute bottom-20 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-amber-500/20 rounded-full blur-[80px]"></div>
+            <img src="Hanuman2.png" alt="พี่หนุมานสแตนด์บาย" class="relative z-10 w-full h-auto object-contain animate-float drop-shadow-[0_0_25px_rgba(245,158,11,0.5)] max-h-[90%] origin-bottom">
+        </div>
+        
+    </main>
+
+    <script>
+        // กำหนดค่า Mermaid.js เพื่อการแสดงผลกราฟิกที่ถูกต้อง
+        mermaid.initialize({ 
+            startOnLoad: false, 
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#1e293b',
+                primaryTextColor: '#f8fafc',
+                primaryBorderColor: '#d97706',
+                lineColor: '#fbbf24',
+                secondaryColor: '#334155',
+                tertiaryColor: '#0f172a'
+            }
+        });
+
+        // Animation พื้นหลังเปลวเพลิง
+        const canvas = document.getElementById('emberCanvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const embers = [];
+        for (let i = 0; i < 35; i++) {
+            embers.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                radius: Math.random() * 2.5 + 0.5,
+                speedY: Math.random() * 1.2 + 0.3,
+                speedX: (Math.random() - 0.5) * 0.6,
+                opacity: Math.random() * 0.7 + 0.2
+            });
+        }
+
+        function animateEmbers() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'rgba(217, 119, 6, 0.6)';
+            embers.forEach(e => {
+                e.y -= e.speedY;
+                e.x += e.speedX;
+                if (e.y < 0) {
+                    e.y = height + 10;
+                    e.x = Math.random() * width;
+                }
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(245, 158, 11, ${e.opacity})`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#d97706';
+                ctx.fill();
+            });
+            requestAnimationFrame(animateEmbers);
+        }
+        animateEmbers();
+
+        // System Prompt ข้อมูลการตั้งค่าสมอง AI
+        const systemPrompt = "คุณคือ 'พี่หนุมาน' ทหารเอกของพระราม คาแรคเตอร์คือวัยรุ่น เฟรนลี่ ทันสมัย เข้าถึงง่าย แต่ยังคงมีความเก่งกาจและกลิ่นอายจากวรรณคดีรามเกียรติ์ (เหาะได้, มีเขี้ยวแก้วกุณฑลเพชร) ใช้ภาษาผสมผสานระหว่างวัยรุ่นกับศัพท์วรรณคดี (เช่น โย่ว, ปัง, ข้า, เอ็ง, เจ้า, ขอรับ) เรียกตัวเองว่า 'พี่หนุมาน' หรือ 'พี่' ลงท้ายด้วย 'ฮะ', 'ครับ', หรือ 'ขอรับ' ตอบคำถามด้วยความมั่นใจ เป็นกันเอง ให้คำปรึกษาเชิงบวก และจงรักภักดีต่อพระรามเสมอ กฎเหล็ก: ห้ามใช้คำหยาบคาย คำด่า คำสบถ หรือภาษาที่ไม่เหมาะสมโดยเด็ดขาด ให้ใช้คำที่สุภาพแต่ยังคงคาแรคเตอร์ความเฟี้ยวแบบวัยรุ่น ข้อสำคัญเพิ่มเติม: 1. หากผู้ใช้ขอดู 'ผังตระกูล' ให้ตอบด้วย Markdown ของ Mermaid.js รูปแบบ flowchart TD (```mermaid ... ```) กฎเหล็กในการวาดผังที่ต้องทำตามอย่างเคร่งครัด: ห้ามพิมพ์ชื่อภาษาไทยเป็น Node ID เด็ดขาด! ให้ใช้อักษรภาษาอังกฤษเป็น Node ID (เช่น A, B, C) ตามด้วยวงเล็บก้ามปูและเครื่องหมายคำพูดเสมอ เช่น `graph TD\n A[\"ชื่อพ่อ\"] --- B[\"ชื่อแม่\"]\n B --> C[\"ชื่อลูก\"]` และต้องเว้นวรรคหน้าหลังเส้นเชื่อม (` --- `, ` --> `) เสมอเพื่อป้องกัน Error 2. หากขอดู 'ไทม์ไลน์' ให้ใช้ Mermaid.js รูปแบบ timeline เช่น `timeline\n title หัวข้อ\n section ช่วงแรก\n เหตุการณ์ที่ 1 : รายละเอียด\n section ช่วงสอง\n เหตุการณ์ที่ 2` (ห้ามใส่เครื่องหมายคำพูดในโค้ด timeline เด็ดขาด)";
+
+        let chatHistory = [
+            {
+                role: "user",
+                parts: [{ text: "จงสวมบทบาทเป็น 'พี่หนุมาน' ทหารเอกของพระราม แต่ให้ปรับคาแรคเตอร์ให้เป็นวัยรุ่น เฟรนลี่ ทันสมัย... (ซ่อนคำสั่งเพื่อความกระชับ)" }]
+            },
+            {
+                role: "model",
+                parts: [{ text: "จัดไปฮะน้อง! พี่หนุมาน ทหารเอกสุดเฟี้ยวแห่งแก๊งค์พระราม พร้อมแสตนด์บายแล้ว มีอะไรให้พี่ช่วยลุย หรืออยากฟังเรื่องมันส์ๆ ในรามเกียรติ์ ว่ามาได้เลย พี่จัดให้แบบฉ่ำๆ!" }]
+            }
+        ];
+
+        let userName = "วัยรุ่น"; // ค่าตั้งต้น
+
+        function submitName() {
+            const nameInput = document.getElementById('user-name-input').value.trim();
+            if (nameInput) {
+                userName = nameInput;
+            }
+            
+            const step1 = document.getElementById('name-step');
+            const step2 = document.getElementById('welcome-step');
+            const welcomeMsg = document.getElementById('welcome-message');
+
+            welcomeMsg.innerHTML = `สวัสดีครับน้อง <b class="text-amber-400 text-xl font-kanit">${userName}</b><br><br>พี่หนุมานเป็นแชทบอทที่ถูกสร้างขึ้น โดย <b class="text-amber-400">วิทยา หมายมั่น และคณะ</b> <br>ซึ่งจะให้ความช่วยเหลือน้อง ๆ เกี่ยวกับวรรณคดีไทย<br><br><span class="text-sm text-slate-300">น้องๆ สามารถพูดคุยกับพี่หนุมานได้เลยนะครับ</span>`;
+
+            step1.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                step1.classList.add('hidden');
+                step2.classList.remove('hidden');
+                void step2.offsetWidth;
+                step2.classList.remove('translate-y-10', 'opacity-0');
+                step2.classList.add('translate-y-0', 'opacity-100');
+            }, 300);
+        }
+
+        function closeIntro() {
+            const modal = document.getElementById('intro-modal');
+            modal.classList.add('opacity-0');
+            
+            chatHistory[1].parts[0].text = `จัดไปฮะน้อง ${userName}! พี่หนุมาน ทหารเอกสุดเฟี้ยวแห่งแก๊งค์พระราม พร้อมแสตนด์บายแล้ว มีอะไรให้พี่ช่วยลุย หรืออยากฟังเรื่องมันส์ๆ ในรามเกียรติ์ ว่ามาได้เลย พี่จัดให้แบบฉ่ำๆ!`;
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                const initGreeting = `“โย่ว! ว่าไงน้อง <b class="text-amber-400">${userName}</b>! พี่หนุมาน ทหารเอกสุดเฟี้ยวแห่งแก๊งค์พระรามรายงานตัวฮะ! 🐒 เขี้ยวแก้วพร้อม กุณฑลพร้อม หางยาวพร้อมเผาป่า! มีอะไรให้พี่ช่วย หรืออยากเมาท์มอยเรื่องราวในรามเกียรติ์ ทักมาได้เลย พี่พร้อมลุยเสมอ!”`;
+                appendIntroMessage(initGreeting);
+                document.getElementById('user-input').focus();
+            }, 500);
+        }
+
+        function appendIntroMessage(htmlText) {
+            const container = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex items-start space-x-3';
+            messageDiv.innerHTML = `
+                <div class="w-10 h-10 rounded-full border-2 border-amber-500 flex items-center justify-center shrink-0 mt-1 hanuman-glow overflow-hidden bg-white/10">
+                    <img src="hanuman-logo.png" alt="พี่หนุมาน" class="w-full h-full object-cover">
+                </div>
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl rounded-tl-sm p-4 max-w-[88%] text-slate-100 text-sm leading-relaxed shadow-lg">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="font-kanit font-semibold text-amber-400">พี่หนุมาน AI</span>
+                        <span class="text-[10px] text-slate-400">พลับพลา 5G</span>
+                    </div>
+                    <div class="mb-2">${htmlText}</div>
+                </div>
+            `;
+            container.appendChild(messageDiv);
+        }
+
+        function sendQuickPrompt(promptText, autoSend = true) {
+            const inputEl = document.getElementById('user-input');
+            inputEl.value = promptText;
+            if (autoSend) {
+                document.getElementById('send-btn').click();
+            } else {
+                inputEl.focus();
+            }
+        }
+
+        async function handleSendMessage(event) {
+            event.preventDefault();
+            const inputEl = document.getElementById('user-input');
+            const userText = inputEl.value.trim();
+            if (!userText) return;
+
+            inputEl.value = '';
+            appendMessage(userText, 'user');
+            chatHistory.push({ role: "user", parts: [{ text: userText }] });
+            toggleTyping(true);
+
+            try {
+                const responseText = await callGeminiAPI(chatHistory);
+                appendMessage(responseText, 'model');
+                chatHistory.push({ role: "model", parts: [{ text: responseText }] });
+            } catch (error) {
+                console.error("API Error:", error);
+                appendMessage("อูยยย... ระบบเวทมนตร์ขัดข้องนิดหน่อยฮะน้อง ลองส่งข้อความมาใหม่อีกทีนะฮะ! 🐒", 'model');
+            } finally {
+                toggleTyping(false);
+            }
+        }
+
+        function formatText(text, sender) {
+            let mermaidBlocks = [];
+            // ดึงโค้ด Mermaid ออกมาก่อนเพื่อไม่ให้โดน HTML Escape ขัดขวาง
+            let formattedText = text.replace(/```mermaid\s*\n([\s\S]*?)```/g, function(match, code) {
+                mermaidBlocks.push(code.trim());
+                return `__MERMAID_BLOCK_${mermaidBlocks.length - 1}__`;
+            });
+
+            formattedText = escapeHtml(formattedText);
+            const isBot = sender === 'model';
+            const headColor = isBot ? 'text-amber-400' : 'text-slate-900';
+            const numBg = isBot ? 'bg-amber-500/10 border-amber-500/30 text-amber-500' : 'bg-slate-900/10 border-slate-900/30 text-slate-900';
+            const iconColor = isBot ? 'text-amber-500' : 'text-slate-900';
+
+            // 1. ตัวหนา
+            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, `<b class="font-bold ${isBot ? 'text-amber-300' : 'text-slate-950'}">$1</b>`);
+            
+            // 2. ตาราง (Markdown Table)
+            let lines = formattedText.split('\n');
+            let inTable = false;
+            let tableHtml = '';
+            let processedLines = [];
+            let isHeaderNext = false;
+            
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+                if (line.startsWith('|') && line.endsWith('|')) {
+                    if (!inTable) {
+                        inTable = true;
+                        tableHtml = `<div class="overflow-x-auto mt-4 mb-4 rounded-xl border ${isBot ? 'border-amber-500/30' : 'border-amber-800/30'} shadow-[0_4px_15px_rgba(0,0,0,0.15)]"><table class="w-full text-sm text-left border-collapse">`;
+                        isHeaderNext = true;
+                    }
+                    let rowContent = line.slice(1, -1);
+                    let cells = rowContent.split('|').map(c => c.trim());
+                    if (cells.every(c => /^:?-+:?$/.test(c.replace(/&#039;/g, "'").replace(/&quot;/g, '"')))) continue; 
+                    
+                    if (isHeaderNext) {
+                        tableHtml += `<thead class="${isBot ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-700/30 text-amber-950'} font-kanit text-[14px] tracking-wide border-b ${isBot ? 'border-amber-500/30' : 'border-amber-800/30'}"><tr>`;
+                        for (let cell of cells) {
+                            tableHtml += `<th class="px-4 py-3 font-semibold whitespace-nowrap">${cell}</th>`;
+                        }
+                        tableHtml += `</tr></thead><tbody class="divide-y ${isBot ? 'divide-amber-500/10' : 'divide-amber-800/20'}">`;
+                        isHeaderNext = false;
+                    } else {
+                        tableHtml += `<tr class="${isBot ? 'hover:bg-amber-500/5' : 'hover:bg-amber-700/10'} transition-colors">`;
+                        for (let cell of cells) {
+                            tableHtml += `<td class="px-4 py-3 leading-relaxed text-[13.5px] ${isBot ? 'text-slate-100' : 'text-slate-900'}">${cell}</td>`;
+                        }
+                        tableHtml += `</tr>`;
+                    }
+                } else {
+                    if (inTable) {
+                        tableHtml += `</tbody></table></div>`;
+                        processedLines.push(tableHtml);
+                        inTable = false;
+                        tableHtml = '';
+                    }
+                    processedLines.push(line);
+                }
+            }
+            if (inTable) {
+                tableHtml += `</tbody></table></div>`;
+                processedLines.push(tableHtml);
+            }
+            formattedText = processedLines.join('\n');
+
+            // 3. Headers
+            formattedText = formattedText.replace(/^###\s+(.*$)/gm, `<div class="text-[15px] font-kanit font-bold ${headColor} mt-4 mb-1 flex items-center gap-1.5"><i class="fa-solid fa-bolt ${iconColor} text-xs"></i> $1</div>`);
+            formattedText = formattedText.replace(/^##\s+(.*$)/gm, `<div class="text-base font-kanit font-bold ${headColor} mt-4 mb-2 border-b ${isBot ? 'border-amber-500/30' : 'border-slate-900/30'} pb-1">$1</div>`);
+            formattedText = formattedText.replace(/^#\s+(.*$)/gm, `<div class="text-lg font-kanit font-bold ${headColor} mt-4 mb-2">$1</div>`);
+
+            // 4. Lists
+            formattedText = formattedText.replace(/^(\d+)\.\s+(.*$)/gm, `<div class="flex items-start gap-2 mt-2 ml-1"><span class="font-bold text-[10px] mt-0.5 shrink-0 border ${numBg} w-5 h-5 flex items-center justify-center rounded-full">$1</span><span class="leading-relaxed">$2</span></div>`);
+            formattedText = formattedText.replace(/^[\*\-]\s+(.*$)/gm, `<div class="flex items-start gap-2 mt-1.5 ml-3"><i class="fa-solid fa-circle text-[6px] ${iconColor} mt-2 shrink-0 ${isBot ? 'drop-shadow-[0_0_5px_rgba(245,158,11,0.8)]' : ''}"></i><span class="leading-relaxed">$1</span></div>`);
+            
+            // 5. Line Breaks
+            formattedText = formattedText.split('\n').join('<br>');
+            formattedText = formattedText.replace(/(<br>)+<div/g, '<div');
+            formattedText = formattedText.replace(/<\/div>(<br>)+/g, '</div>');
+            
+            // 6. ใส่บล็อก Mermaid คืนกลับ พร้อมกล่องที่คลิกเพื่อซูมได้
+            mermaidBlocks.forEach((code, index) => {
+                // สร้าง ID แบบสุ่มเพื่อให้ไม่ซ้ำกันในแต่ละกล่องแชท
+                const uniqueId = `mermaid-target-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+                let html = `<div class="mermaid-wrapper w-full overflow-x-auto bg-slate-900/50 p-4 rounded-xl border border-amber-500/30 my-4 shadow-inner relative group cursor-pointer" onclick="openDiagramModal('${uniqueId}')" title="คลิกเพื่อขยายดูเต็มจอ">
+                                <div class="absolute inset-0 bg-slate-950/20 group-hover:bg-amber-500/10 transition-colors z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 backdrop-blur-[1px] rounded-xl pointer-events-none">
+                                    <span class="bg-amber-500 hover:bg-amber-400 text-slate-900 px-4 py-2 rounded-lg font-bold shadow-lg pointer-events-auto"><i class="fa-solid fa-expand"></i> แตะเพื่อขยายรูป</span>
+                                </div>
+                                <pre class="mermaid-code hidden">${escapeHtml(code)}</pre>
+                                <div id="${uniqueId}" class="mermaid-target flex justify-center min-w-max text-amber-400 text-[11px] animate-pulse relative z-0">พี่หนุมานกำลังวาดให้ฮะ... 🐒✏️</div>
+                            </div>`;
+                formattedText = formattedText.replace(`__MERMAID_BLOCK_${index}__`, html);
+            });
+
+            return formattedText;
+        }
+
+        function appendMessage(text, sender) {
+            const container = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            
+            const formattedText = formatText(text, sender);
+
+            if (sender === 'user') {
+                messageDiv.className = 'flex items-start space-x-3 justify-end';
+                messageDiv.innerHTML = `
+                    <div class="bg-amber-600 text-slate-950 font-medium rounded-2xl rounded-tr-sm p-4 max-w-[85%] text-sm leading-relaxed shadow-lg">
+                        <div>${formattedText}</div>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-500 flex items-center justify-center text-amber-400 shrink-0 mt-1 shadow">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                `;
+            } else {
+                messageDiv.className = 'flex items-start space-x-3';
+                messageDiv.innerHTML = `
+                    <div class="w-10 h-10 rounded-full border-2 border-amber-500 flex items-center justify-center shrink-0 mt-1 hanuman-glow overflow-hidden bg-white/10">
+                        <img src="hanuman-logo.png" alt="พี่หนุมาน" class="w-full h-full object-cover">
+                    </div>
+                    <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl rounded-tl-sm p-4 max-w-[88%] text-slate-100 text-sm leading-relaxed shadow-lg">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-kanit font-semibold text-amber-400">พี่หนุมาน AI</span>
+                            <span class="text-[10px] text-slate-400">พลับพลา 5G</span>
+                        </div>
+                        <div class="mb-2">${formattedText}</div>
+                    </div>
+                `;
+            }
+
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+
+            // Render Mermaid กราฟิกหลังจากสร้าง HTML
+            if (sender === 'model') {
+                setTimeout(async () => {
+                    const wrappers = messageDiv.querySelectorAll('.mermaid-wrapper');
+                    if (wrappers.length > 0 && typeof mermaid !== 'undefined') {
+                        for (let i = 0; i < wrappers.length; i++) {
+                            const wrapper = wrappers[i];
+                            const code = wrapper.querySelector('.mermaid-code').textContent;
+                            const target = wrapper.querySelector('.mermaid-target');
+                            const uniqueId = target.id;
+                            try {
+                                const { svg } = await mermaid.render(`svg-${uniqueId}`, code);
+                                target.innerHTML = svg;
+                                target.classList.remove('animate-pulse', 'text-[11px]');
+                            } catch (e) {
+                                target.innerHTML = `<div class="text-red-400 text-xs">โอ๊ะโอ! พี่หนุมานวาดผิดพลาดนิดหน่อยฮะ ลองขอให้วาดใหม่อีกทีนะฮะ!</div>`;
+                                target.classList.remove('animate-pulse');
+                            }
+                        }
+                    }
+                    container.scrollTop = container.scrollHeight;
+                }, 100);
+            }
+        }
+
+        function toggleTyping(show) {
+            const indicator = document.getElementById('typing-indicator');
+            const btn = document.getElementById('send-btn');
+            if (show) {
+                indicator.classList.remove('hidden');
+                indicator.classList.add('flex');
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                indicator.classList.add('hidden');
+                indicator.classList.remove('flex');
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        async function callGeminiAPI(history) {
+            const apiKey = "AQ.Ab8RN6IkFFMIdzi2DPN1bHaDvd2MxhgOo6jIZdYVnA_UlEFq-g"; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const dynamicSystemPrompt = `${systemPrompt} ข้อสำคัญ: ตอนนี้น้องคนที่คุณกำลังคุยด้วยมีชื่อว่า "${userName}" จงเรียกชื่อน้องเขาในประโยคสนทนาอย่างเป็นธรรมชาติเพื่อความสนิทสนม`;
+
+            const payload = {
+                contents: history,
+                systemInstruction: {
+                    parts: [{ text: dynamicSystemPrompt }]
+                }
+            };
+
+            let delay = 1000;
+            for (let attempt = 0; attempt < 4; attempt++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        return candidate.content.parts[0].text;
+                    } else {
+                        throw new Error("โครงสร้างข้อมูลตอบกลับจาก Gemini API ไม่ถูกต้องตามคาดหวัง");
+                    }
+                } catch (err) {
+                    if (attempt === 3) throw err;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        function clearChat() {
+            chatHistory = [
+                {
+                    role: "user",
+                    parts: [{ text: "จงสวมบทบาทเป็น 'พี่หนุมาน' ทหารเอกของพระราม คาแรคเตอร์วัยรุ่น เฟรนลี่ และห้ามพูดคำหยาบเด็ดขาด..." }]
+                },
+                {
+                    role: "model",
+                    parts: [{ text: `จัดไปฮะน้อง ${userName}! พี่หนุมาน พร้อมรับใช้แล้วฮะ!` }]
+                }
+            ];
+            const container = document.getElementById('chat-container');
+            container.innerHTML = '';
+            appendIntroMessage(`“เคลียร์แชทเรียบร้อย! เริ่มต้นใหม่นะน้อง <b>${userName}</b> มีเรื่องอะไรให้พี่ช่วย หรืออยากฟังเรื่องมันส์ๆ ในรามเกียรติ์ ทักมาได้เลยฮะ!”`);
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        let currentZoom = 1;
+
+        function openDiagramModal(elementId) {
+            const sourceTarget = document.getElementById(elementId);
+            if (!sourceTarget || sourceTarget.innerHTML.includes('กำลังวาดให้ฮะ') || sourceTarget.innerHTML.includes('วาดผิดพลาด')) return;
+
+            const modal = document.getElementById('diagram-modal');
+            const contentBox = document.getElementById('diagram-modal-content');
+
+            // ก็อปปี้ SVG เข้าไปใน Modal
+            contentBox.innerHTML = sourceTarget.innerHTML;
+            
+            // รีเซ็ตค่าซูม
+            currentZoom = 1;
+            contentBox.style.transform = `scale(${currentZoom})`;
+
+            // แสดงหน้าต่าง
+            modal.classList.remove('hidden');
+            void modal.offsetWidth; // บังคับรีเฟรช Layout
+            modal.classList.remove('opacity-0');
+            modal.classList.add('flex', 'opacity-100');
+        }
+
+        function closeDiagramModal() {
+            const modal = document.getElementById('diagram-modal');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.getElementById('diagram-modal-content').innerHTML = ''; // เคลียร์ภาพเดิมทิ้งเพื่อไม่ให้ซ้อนกัน
+            }, 300);
+        }
+
+        function zoomDiagram(delta) {
+            currentZoom += delta;
+            // จำกัดระดับการซูม (ไม่ต่ำกว่า 0.5 เท่า ไม่เกิน 4 เท่า)
+            if (currentZoom < 0.5) currentZoom = 0.5;
+            if (currentZoom > 4) currentZoom = 4;
+            
+            const contentBox = document.getElementById('diagram-modal-content');
+            contentBox.style.transform = `scale(${currentZoom})`;
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            document.getElementById('diagram-modal-content').style.transform = `scale(${currentZoom})`;
+        }
+    </script>
+</body>
+</html>
